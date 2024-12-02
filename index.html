@@ -22,6 +22,10 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         article {
                 padding: 10px;
@@ -80,9 +84,10 @@
                 $("#btnBuscar").click();
             }
         });
-        $("#btnBuscar").click($.debounce(250, function(e){
-            obtenerDatos();
-            obtenerDescripcion();
+        let idGlobal = 0;
+        $("#btnBuscar").click($.debounce(250, async function(e){
+            await obtenerDatos();
+            await obtenerDescripcion();
             const instanciaPokemon = $("#miDiv").mobiscroll().popup(
                 {
                     closeOnEsc: true,
@@ -108,32 +113,27 @@
             
             let tipo = response.types[0].type.name;
             if(response.types.length === 2){
-                tipo = `${tipo} - ${response.types[1].type.name}`;
+                tipo = tipo+" - "+response.types[1].type.name;
             }
             $("#tipoInf").html(`Tipo: ${tipo}`);
             $("#alturaInf").html(`Altura: ${response.height}`);
             $("#pesoInf").html(`Peso: ${response.weight}kg`);
+            idGlobal = response.id;
             } catch (error) {
             console.error('Error fetching data:', error);
             }
         }
         async function obtenerDescripcion(){
-            const nombre = $("#nomPokemon").val();
             try {
-            const response = await $.ajax({
-                url: `https://pokeapi.co/api/v2/pokemon/${nombre}`,
-                method: 'GET'
-            });
-            const nPokdx = response.id;
             const speciesResponse = await $.ajax({
-                url: `https://pokeapi.co/api/v2/pokemon-species/${nPokdx}`,
+                url: 'https://pokeapi.co/api/v2/pokemon-species/'+idGlobal,
                 method: 'GET'
             });
             console.log(speciesResponse);
             const flavorTextEntries = speciesResponse.flavor_text_entries;
             for (let entry of flavorTextEntries) {
                 if (entry.language.name === "es") {
-                $("#descriPoke").html(`Descripcion: ${entry.flavor_text}`);
+                $("#descriPoke").html('Descripcion: '+entry.flavor_text);
                 break;
                 }
             }
