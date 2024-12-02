@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <link href="css/mobiscroll.jquery.min.css" rel="stylesheet">
+    <script src="js/mobiscroll.jquery.min.js"></script>
+    <style>
+        .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: space-between;
+        justify-content: center;
+        }
+        #formulario{
+            display:flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            margin: auto;
+            width: 200px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        article {
+                padding: 10px;
+                margin: 10px;
+            }
+        h1 {
+            text-align: center;
+        }
+        section{
+            flex-direction: column-reverse;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .miDiv {
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="formulario">
+        <h1>Pokedex</h1>
+        <label>
+            <input data-label="Nombre del pokemon" mbsc-input id="nomPokemon" 
+            label-color="light" data-label-style="stacked"/>
+        </label>
+        <button mbsc-button data-color="dark" id="btnBuscar">Buscar Pokemon</button>
+    </div>
+    <div>
+        <div id="miDiv">
+            <section>
+            <h1 id="nomInfor"></h1>
+            <div style="display: flex; justify-content: center;">
+                <img id="pokeImg" width="200px" height="200px"> 
+            </div>
+            </section>
+            <div class="flex-container">
+                <article id="tipoInf"></article>
+                <article id="alturaInf"></article>
+                <article id="pesoInf"></article>
+            </div>
+            <div class="flex-container">
+                <article id="descriPoke"></article>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $("#miDiv").hide();
+        });
+        $("#nomPokemon").keypress(function(e){
+            if(e.which==13){
+                $("#btnBuscar").click();
+            }
+        });
+        $("#btnBuscar").click($.debounce(250, function(e){
+            $nombre = $("#nomPokemon").val();
+            $.get("https://pokeapi.co/api/v2/pokemon/"+$nombre, function(data, status){            
+                console.log(data);
+                console.log(status);
+                $("#nomInfor").html("<font size='8'><b>"+data.name+"</font></b>");
+                $("#pokeImg").attr("src",data.sprites.front_default);
+                //Definir el tipo del pokemon, verificando si tiene mas de uno
+                $tipo = data.types[0].type.name;
+                if(data.types.length===2){
+                    $tipo = $tipo +" - "+data.types[1].type.name;
+                }
+                $("#tipoInf").html("Tipo: "+$tipo);
+
+                $("#alturaInf").html("Altura: "+data.height)
+                $("#pesoInf").html("Peso: "+data.weight+"kg")
+
+                //Encontrando la descripcion de la pokedex
+                $nPokdx = data.id;
+                $.get("https://pokeapi.co/api/v2/pokemon-species/"+$nPokdx,function(data,status){
+                    console.log(data);
+                    $tamanio = data.flavor_text_entries.length;
+                    let $lenguaje = "";
+                    for(i=0; i<$tamanio;i++){
+                        $lenguaje=data.flavor_text_entries[i].language.name;
+                        if($lenguaje==="es"){
+                            $("#descriPoke").html("Descripcion: "+data.flavor_text_entries[i].flavor_text);
+                            break;
+                        }
+                    }
+                    
+                })
+
+                const instanciaPokemon = $("#miDiv").mobiscroll().popup(
+                    {
+                        closeOnEsc: true,
+                        onClose: function(){
+                            $("#nomPokemon").val("");
+                        }
+                    }
+                ).mobiscroll('getInst');
+                instanciaPokemon.open();
+            
+            });
+            
+        }));
+    </script>
+</body>
+</html>
