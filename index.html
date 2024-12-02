@@ -81,6 +81,21 @@
             }
         });
         $("#btnBuscar").click($.debounce(250, function(e){
+            obtenerDatos();
+            obtenerDescripcion();
+            const instanciaPokemon = $("#miDiv").mobiscroll().popup(
+                {
+                    closeOnEsc: true,
+                    onClose: function(){
+                            $("#nomPokemon").val("");
+                    }
+                }
+            ).mobiscroll('getInst');
+            instanciaPokemon.open();
+            
+            })
+        );
+        function obtenerDatos(){
             $nombre = $("#nomPokemon").val();
             $.get("https://pokeapi.co/api/v2/pokemon/"+$nombre, function(data, status){            
                 console.log(data);
@@ -96,8 +111,12 @@
 
                 $("#alturaInf").html("Altura: "+data.height)
                 $("#pesoInf").html("Peso: "+data.weight+"kg")
-
-                //Encontrando la descripcion de la pokedex
+            });
+        }
+        function obtenerDescripcion(){
+            //Encontrando la descripcion de la pokedex
+            $nombre = $("#nomPokemon").val();
+            $.get("https://pokeapi.co/api/v2/pokemon/"+$nombre, function(data, status){
                 $nPokdx = data.id;
                 $.get("https://pokeapi.co/api/v2/pokemon-species/"+$nPokdx,function(data,status){
                     console.log(data);
@@ -112,20 +131,9 @@
                     }
                     
                 })
-
-                const instanciaPokemon = $("#miDiv").mobiscroll().popup(
-                    {
-                        closeOnEsc: true,
-                        onClose: function(){
-                            $("#nomPokemon").val("");
-                        }
-                    }
-                ).mobiscroll('getInst');
-                instanciaPokemon.open();
-            
             });
-            
-        }));
+        }
+        
     </script>
 </body>
 </html>
