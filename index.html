@@ -95,43 +95,51 @@
             
             })
         );
-        function obtenerDatos(){
-            $nombre = $("#nomPokemon").val();
-            $.get("https://pokeapi.co/api/v2/pokemon/"+$nombre, function(data, status){            
-                console.log(data);
-                console.log(status);
-                $("#nomInfor").html("<font size='8'><b>"+data.name+"</font></b>");
-                $("#pokeImg").attr("src",data.sprites.front_default);
-                //Definir el tipo del pokemon, verificando si tiene mas de uno
-                $tipo = data.types[0].type.name;
-                if(data.types.length===2){
-                    $tipo = $tipo +" - "+data.types[1].type.name;
-                }
-                $("#tipoInf").html("Tipo: "+$tipo);
-
-                $("#alturaInf").html("Altura: "+data.height)
-                $("#pesoInf").html("Peso: "+data.weight+"kg")
+        async function obtenerDatos(){
+            const nombre = $("#nomPokemon").val();
+            try {
+            const response = await $.ajax({
+                url: `https://pokeapi.co/api/v2/pokemon/${nombre}`,
+                method: 'GET'
             });
+            console.log(response);
+            $("#nomInfor").html(`<font size='8'><b>${response.name}</font></b>`);
+            $("#pokeImg").attr("src", response.sprites.front_default);
+            
+            let tipo = response.types[0].type.name;
+            if(response.types.length === 2){
+                tipo = `${tipo} - ${response.types[1].type.name}`;
+            }
+            $("#tipoInf").html(`Tipo: ${tipo}`);
+            $("#alturaInf").html(`Altura: ${response.height}`);
+            $("#pesoInf").html(`Peso: ${response.weight}kg`);
+            } catch (error) {
+            console.error('Error fetching data:', error);
+            }
         }
-        function obtenerDescripcion(){
-            //Encontrando la descripcion de la pokedex
-            $nombre = $("#nomPokemon").val();
-            $.get("https://pokeapi.co/api/v2/pokemon/"+$nombre, function(data, status){
-                $nPokdx = data.id;
-                $.get("https://pokeapi.co/api/v2/pokemon-species/"+$nPokdx,function(data,status){
-                    console.log(data);
-                    $tamanio = data.flavor_text_entries.length;
-                    let $lenguaje = "";
-                    for(i=0; i<$tamanio;i++){
-                        $lenguaje=data.flavor_text_entries[i].language.name;
-                        if($lenguaje==="es"){
-                            $("#descriPoke").html("Descripcion: "+data.flavor_text_entries[i].flavor_text);
-                            break;
-                        }
-                    }
-                    
-                })
+        async function obtenerDescripcion(){
+            const nombre = $("#nomPokemon").val();
+            try {
+            const response = await $.ajax({
+                url: `https://pokeapi.co/api/v2/pokemon/${nombre}`,
+                method: 'GET'
             });
+            const nPokdx = response.id;
+            const speciesResponse = await $.ajax({
+                url: `https://pokeapi.co/api/v2/pokemon-species/${nPokdx}`,
+                method: 'GET'
+            });
+            console.log(speciesResponse);
+            const flavorTextEntries = speciesResponse.flavor_text_entries;
+            for (let entry of flavorTextEntries) {
+                if (entry.language.name === "es") {
+                $("#descriPoke").html(`Descripcion: ${entry.flavor_text}`);
+                break;
+                }
+            }
+            } catch (error) {
+            console.error('Error fetching description:', error);
+            }
         }
         
     </script>
