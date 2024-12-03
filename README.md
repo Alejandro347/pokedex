@@ -31,10 +31,6 @@ Este proyecto es una Pokedex que utiliza jQuery y JavaScript para consumir la AP
 
 Las contribuciones son bienvenidas. Por favor, abre un issue o envía un pull request.
 
-## Licencia
-
-Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
-
 ## Créditos
 
 - [Pokémon API](https://pokeapi.co/)
