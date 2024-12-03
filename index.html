@@ -86,7 +86,10 @@
         });
         let idGlobal = 0;
         $("#btnBuscar").click($.debounce(250, async function(e){
-            await obtenerDatos();
+            idGlobal = 0;
+            let funciona = await obtenerDatos();
+            if(funciona){
+                $("#miDiv").show();
             await obtenerDescripcion();
             const instanciaPokemon = $("#miDiv").mobiscroll().popup(
                 {
@@ -97,8 +100,20 @@
                 }
             ).mobiscroll('getInst');
             instanciaPokemon.open();
+        
+            }
+            else{
+                limpiar();
+                mobiscroll.alert({
+                    title: 'Error',
+                    message: 'Pokemon no encontrado',
+                    callback: function(){
+                        $("#nomPokemon").focus();
+                    },
+                    display: 'center',
+                });
+            }})
             
-            })
         );
         async function obtenerDatos(){
             const nombre = $("#nomPokemon").val();
@@ -119,8 +134,10 @@
             $("#alturaInf").html(`Altura: ${response.height}`);
             $("#pesoInf").html(`Peso: ${response.weight}kg`);
             idGlobal = response.id;
+            return true;
             } catch (error) {
             console.error('Error fetching data:', error);
+            return false;
             }
         }
         async function obtenerDescripcion(){
@@ -140,6 +157,16 @@
             } catch (error) {
             console.error('Error fetching description:', error);
             }
+        }
+        function limpiar() {
+            $("#nomPokemon").val("");
+            $("#nomInfor").html("");
+            $("#pokeImg").attr("src", "");
+            $("#tipoInf").html("");
+            $("#alturaInf").html("");
+            $("#pesoInf").html("");
+            $("#descriPoke").html("");
+            
         }
         
     </script>
