@@ -76,18 +76,28 @@
         </div>
     </div>
     <script>
+        //ocultando elementos que estaran en el popup
         $(document).ready(function(){
             $("#miDiv").hide();
         });
+        
+        //funcion para buscar al presionar enter
         $("#nomPokemon").keypress(function(e){
             if(e.which==13){
                 $("#btnBuscar").click();
             }
         });
+        
+        //Inicializando variable global para el id del pokemon
         let idGlobal = 0;
+
+        //Debounce para evitar multiples peticiones en la funcion de buscar
         $("#btnBuscar").click($.debounce(250, async function(e){
+            //se inicializa la variable global en 0
             idGlobal = 0;
+            //se obtiene el estado de la funcion obtenerDatos
             let funciona = await obtenerDatos();
+            //si la funcion obtenerDatos retorna true, se ejecuta la funcion obtenerDescripcion
             if(funciona){
             await obtenerDescripcion();
             const instanciaPokemon = $("#miDiv").mobiscroll().popup(
@@ -101,6 +111,7 @@
             instanciaPokemon.open();
         
             }
+            //si la funcion obtenerDatos retorna false, se limpian los campos y se muestra un mensaje de error
             else{
                 limpiar();
                 mobiscroll.alert({
@@ -112,8 +123,9 @@
                     display: 'center',
                 });
             }})
-            
         );
+
+        //funcion para obtener los datos del pokemon
         async function obtenerDatos(){
             const nombre = $("#nomPokemon").val();
             try {
@@ -139,6 +151,8 @@
             return false;
             }
         }
+
+        //funcion para obtener la descripcion del pokemon
         async function obtenerDescripcion(){
             try {
             const speciesResponse = await $.ajax({
@@ -157,6 +171,8 @@
             console.error('Error fetching description:', error);
             }
         }
+
+        //funcion para limpiar los campos
         function limpiar() {
             $("#nomPokemon").val("");
             $("#nomInfor").html("");
