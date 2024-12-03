@@ -89,7 +89,6 @@
             idGlobal = 0;
             let funciona = await obtenerDatos();
             if(funciona){
-                $("#miDiv").show();
             await obtenerDescripcion();
             const instanciaPokemon = $("#miDiv").mobiscroll().popup(
                 {
@@ -107,7 +106,7 @@
                 mobiscroll.alert({
                     title: 'Error',
                     message: 'Pokemon no encontrado',
-                    callback: function(){
+                    onClose: function(){
                         $("#nomPokemon").focus();
                     },
                     display: 'center',
