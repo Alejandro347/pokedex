@@ -23,7 +23,7 @@ Este proyecto es una Pokedex que utiliza jQuery y JavaScript para consumir la AP
 
 ## Uso
 
-1. La aplicación permite buscar Pokémon por nombre o número.
+1. La aplicación permite buscar Pokémon por nombre.
 2. Muestra información detallada de cada Pokémon, incluyendo su imagen, tipo, habilidades y estadísticas.
 3. Maneja errores en caso de que la API no responda o el Pokémon no exista.
 
